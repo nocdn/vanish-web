@@ -7,7 +7,10 @@ import { useState } from "react";
 import { api } from "../convex/_generated/api";
 
 export default function Home() {
-	const emails = useQuery(api.emails.getEmails);
+	const emailsData = useQuery(api.emails.getEmails);
+	const emails = emailsData
+		?.slice()
+		.sort((a, b) => b._creationTime - a._creationTime);
 	const [copiedId, setCopiedId] = useState<string | null>(null);
 
 	const handleCopy = (id: string, email: string) => {
@@ -49,9 +52,25 @@ export default function Home() {
 									}}
 								>
 									{copiedId === email._id ? (
-										<span className="text-blue-700">[copied]</span>
+										<span className="text-blue-700 leading-none">[copied]</span>
 									) : (
-										email.email
+										<>
+											{email.email}
+											{email.expiry && (
+												<span
+													className="text-blue-700 ml-2 text-[14px] font-medium opacity-80"
+													style={{ fontFamily: "var(--font-jetbrains-mono)" }}
+												>
+													[
+													{new Date(email.expiry).toLocaleDateString("en-US", {
+														month: "short",
+														day: "numeric",
+														year: "numeric",
+													})}
+													]
+												</span>
+											)}
+										</>
 									)}
 								</button>
 								{email.comment && (
@@ -60,14 +79,6 @@ export default function Home() {
 										style={{ fontFamily: "var(--font-inter)" }}
 									>
 										{email.comment}
-									</span>
-								)}
-								{email.expiry && (
-									<span
-										className="text-xs text-muted-foreground/60"
-										style={{ fontFamily: "var(--font-inter)" }}
-									>
-										expires {new Date(email.expiry).toLocaleDateString()}
 									</span>
 								)}
 							</li>

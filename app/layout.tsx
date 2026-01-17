@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Inter } from 'next/font/google';
+import { Geist, Geist_Mono, Inter, JetBrains_Mono } from 'next/font/google';
 import localFont from 'next/font/local';
 
 import './globals.css';
@@ -26,6 +26,11 @@ const ppSupplyMono = localFont({
   variable: '--font-pp-supply-mono',
 });
 
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-jetbrains-mono',
+  subsets: ['latin'],
+});
+
 export const metadata: Metadata = {
   title: 'Temp Emails AGAIN',
   description: 'Temp Emails AGAIN',
@@ -39,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${ppSupplyMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${ppSupplyMono.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <ConvexClientProvider>{children}</ConvexClientProvider>
       </body>
