@@ -1,53 +1,52 @@
-import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Inter, JetBrains_Mono } from 'next/font/google';
-import localFont from 'next/font/local';
+import type { Metadata } from "next";
+import { Geist, Geist_Mono, Inter, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 
-import './globals.css';
+import "./globals.css";
 
-import { ConvexClientProvider } from './ConvexClientProvider';
+import { ConvexClientProvider } from "./ConvexClientProvider";
 
 const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
+	variable: "--font-geist-sans",
+	subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+	variable: "--font-geist-mono",
+	subsets: ["latin"],
 });
 
 const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin'],
+	variable: "--font-inter",
+	subsets: ["latin"],
 });
 
 const ppSupplyMono = localFont({
-  src: './fonts/PPSupplyMono-Variable.woff2',
-  variable: '--font-pp-supply-mono',
+	src: "./fonts/PPSupplyMono-Variable.woff2",
+	variable: "--font-pp-supply-mono",
 });
 
 const jetbrainsMono = JetBrains_Mono({
-  variable: '--font-jetbrains-mono',
-  subsets: ['latin'],
+	variable: "--font-jetbrains-mono",
+	subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: 'Temp Emails AGAIN',
-  description: 'Temp Emails AGAIN',
+	title: "vanish",
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${ppSupplyMono.variable} ${jetbrainsMono.variable} antialiased`}
-      >
-        <ConvexClientProvider>{children}</ConvexClientProvider>
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en">
+			<body
+				className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${ppSupplyMono.variable} ${jetbrainsMono.variable} antialiased`}
+			>
+				<ConvexClientProvider>{children}</ConvexClientProvider>
+			</body>
+		</html>
+	);
 }
