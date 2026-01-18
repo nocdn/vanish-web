@@ -92,6 +92,8 @@ export default function Home() {
 
 	const debounceRef = useRef<NodeJS.Timeout | null>(null);
 	const editDebounceRef = useRef<NodeJS.Timeout | null>(null);
+	const expiryInputRef = useRef<HTMLInputElement>(null);
+	const commentInputRef = useRef<HTMLInputElement>(null);
 
 	const handleCopy = (id: string, email: string) => {
 		navigator.clipboard.writeText(email);
@@ -146,6 +148,43 @@ export default function Home() {
 			if (editDebounceRef.current) clearTimeout(editDebounceRef.current);
 		};
 	}, []);
+
+	useEffect(() => {
+		const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+		if (isMobile) return;
+
+		const handleGlobalKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Enter" && !generateDrawerOpen && !editDrawerOpen) {
+				const target = e.target as HTMLElement;
+				if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
+				e.preventDefault();
+				setGenerateDrawerOpen(true);
+			}
+		};
+
+		window.addEventListener("keydown", handleGlobalKeyDown);
+		return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+	}, [generateDrawerOpen, editDrawerOpen]);
+
+	useEffect(() => {
+		if (generateDrawerOpen) {
+			setTimeout(() => expiryInputRef.current?.focus(), 100);
+		}
+	}, [generateDrawerOpen]);
+
+	const handleExpiryKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			commentInputRef.current?.focus();
+		}
+	};
+
+	const handleCommentKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			handleConfirm();
+		}
+	};
 
 	const generateRandomEmail = () => {
 		const words = generate({ exactly: 2, maxLength: 8 }) as string[];
@@ -233,80 +272,94 @@ export default function Home() {
 				onOpenChange={setGenerateDrawerOpen}
 				shouldScaleBackground
 			>
-				<main className="min-h-screen bg-background px-6 py-12 md:px-12 lg:px-24 pb-24">
-					<div className="mx-auto max-w-2xl">
-						<h1 className="mb-8 flex items-center gap-3 text-2xl font-medium tracking-tight text-foreground">
-							vanish
-							{!emails && (
-								<Loader className="h-4 w-4 animate-spin text-muted-foreground translate-y-0.5" />
-							)}
-						</h1>
-
-						{emails && emails.length === 0 ? (
-							<div className="text-sm text-muted-foreground">No emails yet</div>
-						) : emails ? (
-							<ul className="space-y-4">
-								{emails.map((email, index) => (
-									<li
-										key={email._id}
-										className="group flex flex-col gap-1 border-b border-border pb-4 last:border-0 animate-in fade-in slide-in-from-bottom-1 cursor-pointer"
-										style={{
-											animationDelay: `${index * 0.02}s`,
-											animationFillMode: "backwards",
-										}}
-										onClick={() => openEditDrawer(email)}
-									>
-										<div className="flex gap-2 md:flex-row flex-col md:items-center items-start">
-											<button
-												type="button"
-												onClick={(e) => {
-													e.stopPropagation();
-													handleCopy(email._id, email.email);
-												}}
-												className="w-fit cursor-pointer text-left text-regular text-foreground hover:opacity-70 transition-opacity leading-none"
-												style={{
-													fontFamily: "var(--font-pp-supply-mono)",
-													fontWeight: 340,
-												}}
-											>
-												{copiedId === email._id ? (
-													<span className="text-blue-700 leading-none">
-														[copied]
-													</span>
-												) : (
-													email.email
-												)}
-											</button>
-											{email.expiry && copiedId !== email._id && (
-												<button
-													type="button"
-													className="text-blue-700 text-[14px] font-medium opacity-80 cursor-pointer hover:opacity-100"
-													style={{ fontFamily: "var(--font-jetbrains-mono)" }}
-													onClick={(e) => toggleDateExpand(email._id, e)}
-												>
-													[
-													{expandedDates.has(email._id)
-														? formatFullDateTime(email.expiry)
-														: formatRelativeTime(email.expiry)}
-													]
-												</button>
-											)}
-										</div>
-										{email.comment && (
-											<span
-												className="text-[13px] text-muted-foreground"
-												style={{ fontFamily: "var(--font-inter)" }}
-											>
-												{email.comment}
-											</span>
-										)}
-									</li>
-								))}
-							</ul>
-						) : null}
+				<main className="h-screen bg-background flex flex-col">
+					<div className="px-6 pt-12 md:px-12 lg:px-24">
+						<div className="mx-auto max-w-2xl">
+							<h1 className="flex items-center gap-3 text-2xl font-medium tracking-tight text-foreground">
+								vanish
+								{!emails && (
+									<Loader className="h-4 w-4 animate-spin text-muted-foreground translate-y-0.5" />
+								)}
+							</h1>
+						</div>
 					</div>
 
-					<div className="fixed bottom-6 left-0 right-0 px-6 md:px-12 lg:px-24">
+					<div className="relative flex-1 overflow-hidden">
+						<div className="top-scroll-mask z-10" />
+						<div className="absolute inset-0 overflow-y-auto px-6 md:px-12 lg:px-24 py-8">
+							<div className="mx-auto max-w-2xl">
+								{emails && emails.length === 0 ? (
+									<div className="text-sm text-muted-foreground">
+										No emails yet
+									</div>
+								) : emails ? (
+									<ul className="space-y-4 pb-8">
+										{emails.map((email, index) => (
+											<li
+												key={email._id}
+												className="group flex flex-col gap-1 border-b border-border pb-4 last:border-0 animate-in fade-in slide-in-from-bottom-1 cursor-pointer"
+												style={{
+													animationDelay: `${index * 0.02}s`,
+													animationFillMode: "backwards",
+												}}
+												onClick={() => openEditDrawer(email)}
+											>
+												<div className="flex gap-2 md:flex-row flex-col md:items-center items-start">
+													<button
+														type="button"
+														onClick={(e) => {
+															e.stopPropagation();
+															handleCopy(email._id, email.email);
+														}}
+														className="w-fit cursor-pointer text-left text-regular text-foreground hover:opacity-70 transition-opacity leading-none"
+														style={{
+															fontFamily: "var(--font-pp-supply-mono)",
+															fontWeight: 340,
+														}}
+													>
+														{copiedId === email._id ? (
+															<span className="text-blue-700 leading-none">
+																[copied]
+															</span>
+														) : (
+															email.email
+														)}
+													</button>
+													{email.expiry && copiedId !== email._id && (
+														<button
+															type="button"
+															className="text-blue-700 text-[14px] font-medium opacity-80 cursor-pointer hover:opacity-100"
+															style={{
+																fontFamily: "var(--font-jetbrains-mono)",
+															}}
+															onClick={(e) => toggleDateExpand(email._id, e)}
+														>
+															[
+															{expandedDates.has(email._id)
+																? formatFullDateTime(email.expiry)
+																: formatRelativeTime(email.expiry)}
+															]
+														</button>
+													)}
+												</div>
+												{email.comment && (
+													<span
+														className="text-[13px] text-muted-foreground"
+														style={{ fontFamily: "var(--font-inter)" }}
+													>
+														{email.comment}
+													</span>
+												)}
+											</li>
+										))}
+									</ul>
+								) : null}
+							</div>
+						</div>
+						<div className="bottom-scroll-mask z-10 translate-y-1.5" />
+					</div>
+
+					<div className="px-6 pb-6 md:px-12 lg:px-24">
 						<div className="mx-auto max-w-2xl">
 							<Drawer.Trigger asChild>
 								<button
@@ -345,12 +398,14 @@ export default function Home() {
 									</label>
 									<div className="relative">
 										<input
+											ref={expiryInputRef}
 											id="expiry"
 											type="text"
 											spellCheck={false}
 											autoCorrect="off"
 											value={expiryInput}
 											onChange={(e) => handleExpiryChange(e.target.value)}
+											onKeyDown={handleExpiryKeyDown}
 											placeholder="Optional"
 											className="w-full px-3 py-2 pr-9 border border-border rounded-md bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
 										/>
@@ -368,12 +423,14 @@ export default function Home() {
 										Comment
 									</label>
 									<input
+										ref={commentInputRef}
 										id="comment"
 										type="text"
 										spellCheck={false}
 										autoCorrect="off"
 										value={comment}
 										onChange={(e) => setComment(e.target.value)}
+										onKeyDown={handleCommentKeyDown}
 										placeholder="Optional"
 										className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
 									/>
