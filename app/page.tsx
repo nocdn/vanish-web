@@ -74,6 +74,7 @@ export default function Home() {
 	const [parsedExpiry, setParsedExpiry] = useState<number | undefined>(
 		undefined,
 	);
+	const [isParsingExpiry, setIsParsingExpiry] = useState(false);
 	const [comment, setComment] = useState("");
 	const [isGenerating, setIsGenerating] = useState(false);
 
@@ -83,6 +84,7 @@ export default function Home() {
 	const [editParsedExpiry, setEditParsedExpiry] = useState<number | undefined>(
 		undefined,
 	);
+	const [isParsingEditExpiry, setIsParsingEditExpiry] = useState(false);
 	const [editComment, setEditComment] = useState("");
 	const [editCopied, setEditCopied] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -115,8 +117,12 @@ export default function Home() {
 		if (debounceRef.current) {
 			clearTimeout(debounceRef.current);
 		}
+		if (value.trim()) {
+			setIsParsingExpiry(true);
+		}
 		debounceRef.current = setTimeout(() => {
 			setParsedExpiry(parseExpiry(value));
+			setIsParsingExpiry(false);
 		}, 300);
 	}, []);
 
@@ -125,8 +131,12 @@ export default function Home() {
 		if (editDebounceRef.current) {
 			clearTimeout(editDebounceRef.current);
 		}
+		if (value.trim()) {
+			setIsParsingEditExpiry(true);
+		}
 		editDebounceRef.current = setTimeout(() => {
 			setEditParsedExpiry(parseExpiry(value));
+			setIsParsingEditExpiry(false);
 		}, 300);
 	}, []);
 
@@ -333,14 +343,19 @@ export default function Home() {
 											</p>
 										)}
 									</label>
-									<input
-										id="expiry"
-										type="text"
-										value={expiryInput}
-										onChange={(e) => handleExpiryChange(e.target.value)}
-										placeholder="Optional"
-										className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-									/>
+									<div className="relative">
+										<input
+											id="expiry"
+											type="text"
+											value={expiryInput}
+											onChange={(e) => handleExpiryChange(e.target.value)}
+											placeholder="Optional"
+											className="w-full px-3 py-2 pr-9 border border-border rounded-md bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+										/>
+										{isParsingExpiry && (
+											<Loader className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+										)}
+									</div>
 								</div>
 
 								<div>
@@ -420,18 +435,23 @@ export default function Home() {
 												</p>
 											)}
 										</label>
-										<input
-											id="edit-expiry"
-											type="text"
-											value={editExpiryInput}
-											onChange={(e) => handleEditExpiryChange(e.target.value)}
-											placeholder={
-												editingEmail.expiry
-													? formatFullDateTime(editingEmail.expiry)
-													: "No expiry set"
-											}
-											className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-										/>
+										<div className="relative">
+											<input
+												id="edit-expiry"
+												type="text"
+												value={editExpiryInput}
+												onChange={(e) => handleEditExpiryChange(e.target.value)}
+												placeholder={
+													editingEmail.expiry
+														? formatFullDateTime(editingEmail.expiry)
+														: "No expiry set"
+												}
+												className="w-full px-3 py-2 pr-9 border border-border rounded-md bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+											/>
+											{isParsingEditExpiry && (
+												<Loader className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+											)}
+										</div>
 									</div>
 
 									<div>
