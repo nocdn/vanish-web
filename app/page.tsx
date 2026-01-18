@@ -347,6 +347,8 @@ export default function Home() {
 										<input
 											id="expiry"
 											type="text"
+											spellCheck={false}
+											autoCorrect="off"
 											value={expiryInput}
 											onChange={(e) => handleExpiryChange(e.target.value)}
 											placeholder="Optional"
@@ -368,6 +370,8 @@ export default function Home() {
 									<input
 										id="comment"
 										type="text"
+										spellCheck={false}
+										autoCorrect="off"
 										value={comment}
 										onChange={(e) => setComment(e.target.value)}
 										placeholder="Optional"
@@ -439,6 +443,8 @@ export default function Home() {
 											<input
 												id="edit-expiry"
 												type="text"
+												spellCheck={false}
+												autoCorrect="off"
 												value={editExpiryInput}
 												onChange={(e) => handleEditExpiryChange(e.target.value)}
 												placeholder={
@@ -464,6 +470,8 @@ export default function Home() {
 										<input
 											id="edit-comment"
 											type="text"
+											spellCheck={false}
+											autoCorrect="off"
 											value={editComment}
 											onChange={(e) => setEditComment(e.target.value)}
 											placeholder="Optional"
