@@ -176,3 +176,44 @@ export const getEmailById = query({
 		return await ctx.db.get(args.id);
 	},
 });
+
+export const updateEmailInDb = internalMutation({
+	args: {
+		id: v.id("emails"),
+		expiry: v.optional(v.number()),
+		comment: v.optional(v.string()),
+	},
+	handler: async (ctx, args) => {
+		await ctx.db.patch(args.id, {
+			expiry: args.expiry,
+			comment: args.comment,
+		});
+	},
+});
+
+export const updateEmail = action({
+	args: {
+		id: v.id("emails"),
+		expiry: v.optional(v.number()),
+		comment: v.optional(v.string()),
+	},
+	handler: async (ctx, args) => {
+		const email = await ctx.runQuery(api.emails.getEmailById, { id: args.id });
+		if (!email) {
+			console.log("Email not found:", args.id);
+			return;
+		}
+
+		await ctx.runMutation(internal.emails.updateEmailInDb, {
+			id: args.id,
+			expiry: args.expiry,
+			comment: args.comment,
+		});
+
+		if (args.expiry && args.expiry !== email.expiry) {
+			await ctx.scheduler.runAt(args.expiry, api.emails.deleteEmail, {
+				id: args.id,
+			});
+		}
+	},
+});

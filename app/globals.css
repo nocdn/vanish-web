@@ -123,3 +123,35 @@
     @apply bg-background text-foreground;
   }
 }
+
+[vaul-drawer-wrapper] {
+  background-color: var(--background);
+  transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.button-3 {
+  background-color: #fff;
+  color: #4b4b4b;
+  border-radius: 12px;
+  border: 2px solid #e6e6e6;
+  box-shadow: 0 2px 0 #e6e6e6;
+  cursor: pointer;
+  font-family: var(--font-inter);
+  &:focus {
+    outline: none;
+  }
+}
+
+.button-delete {
+  /* color: #4b4b4b; */
+  color: #a02e28;
+  border-radius: 12px;
+  border: 2px solid #eb5a53;
+  box-shadow: 0 2px 0 #eb5a53;
+  background-color: #f9e0df;
+  cursor: pointer;
+  font-family: var(--font-inter);
+  &:focus {
+    outline: none;
+  }
+}

@@ -32,7 +32,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "vanish",
+	title: "Vanish",
 };
 
 export default function RootLayout({
@@ -45,7 +45,9 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${ppSupplyMono.variable} ${jetbrainsMono.variable} antialiased`}
 			>
-				<ConvexClientProvider>{children}</ConvexClientProvider>
+				<div data-vaul-drawer-wrapper="" className="bg-background min-h-screen">
+					<ConvexClientProvider>{children}</ConvexClientProvider>
+				</div>
 			</body>
 		</html>
 	);
