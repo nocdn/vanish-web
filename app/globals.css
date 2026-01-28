@@ -9,8 +9,7 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-inter: var(--font-inter);
-  --font-pp-supply-mono: var(--font-pp-supply-mono);
-  --font-jetbrains-mono: var(--font-jetbrains-mono);
+  --font-berkeley-mono: var(--font-berkeley-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -182,4 +181,13 @@
     rgba(255, 255, 255, 1) 80%
   );
   pointer-events: none;
+}
+
+.thick {
+  color: #000;
+  text-shadow:
+    -1px -1px 0 currentColor,
+     1px -1px 0 currentColor,
+    -1px  1px 0 currentColor,
+     1px  1px 0 currentColor;
 }

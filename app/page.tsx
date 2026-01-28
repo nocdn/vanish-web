@@ -276,7 +276,14 @@ export default function Home() {
           <div className="px-6 pt-12 md:px-12 lg:px-24">
             <div className="mx-auto max-w-2xl">
               <h1 className="flex items-center gap-3 text-2xl font-medium tracking-tight text-foreground">
-                vanish
+                <span className="relative">
+                  vanish
+                  {emails && emails.length > 0 && (
+                    <span className="absolute -top-1.25 -right-5 text-xs text-gray-500 font-medium font-inter">
+                      <span className="mr-0.5">[</span>{emails.length}<span className="ml-0.5">]</span>
+                    </span>
+                  )}
+                </span>
                 {!emails && (
                   <Loader className="h-4 w-4 animate-spin text-muted-foreground translate-y-0.5" />
                 )}
@@ -310,10 +317,10 @@ export default function Home() {
                               e.stopPropagation();
                               handleCopy(email._id, email.email);
                             }}
-                            className="w-fit cursor-pointer text-left text-regular text-foreground hover:opacity-70 transition-opacity leading-none"
+                            className="w-fit cursor-pointer text-left text-[15px] text-foreground hover:opacity-70 transition-opacity leading-none"
                             style={{
-                              fontFamily: 'var(--font-pp-supply-mono)',
-                              fontWeight: 340,
+                              fontFamily: 'var(--font-berkeley-mono)',
+                              textShadow: '0.2px 0.2px 0 black',
                             }}
                           >
                             {copiedId === email._id ? (
@@ -329,7 +336,8 @@ export default function Home() {
                               type="button"
                               className="text-blue-700 text-[14px] font-medium opacity-80 cursor-pointer hover:opacity-100"
                               style={{
-                                fontFamily: 'var(--font-jetbrains-mono)',
+                                fontFamily: 'var(--font-berkeley-mono)',
+                                textShadow: '0.2px 0.2px 0 black',
                               }}
                               onClick={(e) => toggleDateExpand(email._id, e)}
                             >
@@ -472,8 +480,8 @@ export default function Home() {
                     onClick={handleEditCopy}
                     className="w-full text-left text-foreground hover:opacity-70 transition-opacity"
                     style={{
-                      fontFamily: 'var(--font-pp-supply-mono)',
-                      fontWeight: 340,
+                      fontFamily: 'var(--font-berkeley-mono)',
+                      textShadow: '0.2px 0.2px 0 black',
                     }}
                   >
                     {editCopied ? (

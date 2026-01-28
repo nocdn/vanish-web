@@ -7,8 +7,6 @@ const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
 if (!convexUrl) throw new Error("NEXT_PUBLIC_CONVEX_URL is not set");
 const convex = new ConvexHttpClient(convexUrl);
 
-const DOMAIN = process.env.DOMAIN;
-
 function generateRandomEmail(): string {
 	const words = generate({ exactly: 2, maxLength: 8 }) as string[];
 	const randomNum = Math.floor(Math.random() * 900) + 100;
@@ -28,7 +26,6 @@ export async function POST(request: Request) {
 	const { expiry, comment } = body;
 
 	const emailPrefix = generateRandomEmail();
-	const fullEmail = `${emailPrefix}@${DOMAIN}`;
 
 	let expiryTimestamp: number | undefined;
 	const trimmedExpiry = typeof expiry === "string" ? expiry.trim() : "";
@@ -42,9 +39,13 @@ export async function POST(request: Request) {
 		expiry: expiryTimestamp,
 	});
 
+	// Get the newly created email from the database to return the full email address
+	const emails = await convex.query(api.emails.getEmails);
+	const createdEmail = emails.find((e: { email: string }) => e.email.startsWith(emailPrefix));
+
 	return new Response(
 		JSON.stringify({
-			email: fullEmail,
+			email: createdEmail?.email ?? emailPrefix,
 			expiry: expiryTimestamp,
 			cloudflare: result,
 		}),

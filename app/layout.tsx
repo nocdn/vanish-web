@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import localFont from "next/font/local";
 
 import "./globals.css";
@@ -21,14 +21,9 @@ const inter = Inter({
 	subsets: ["latin"],
 });
 
-const ppSupplyMono = localFont({
-	src: "./fonts/PPSupplyMono-Variable.woff2",
-	variable: "--font-pp-supply-mono",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-	variable: "--font-jetbrains-mono",
-	subsets: ["latin"],
+const berkeleyMono = localFont({
+	src: "./fonts/BerkeleyMono_Regular.woff2",
+	variable: "--font-berkeley-mono",
 });
 
 export const metadata: Metadata = {
@@ -43,7 +38,7 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${ppSupplyMono.variable} ${jetbrainsMono.variable} antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${berkeleyMono.variable} antialiased`}
 			>
 				<div data-vaul-drawer-wrapper="" className="bg-background min-h-screen">
 					<ConvexClientProvider>{children}</ConvexClientProvider>
