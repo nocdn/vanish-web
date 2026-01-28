@@ -276,17 +276,14 @@ export default function Home() {
           <div className="px-6 pt-12 md:px-12 lg:px-24">
             <div className="mx-auto max-w-2xl">
               <h1 className="flex items-center gap-3 text-2xl font-medium tracking-tight text-foreground">
-                <span className="relative">
-                  vanish
-                  {emails && emails.length > 0 && (
-                    <span className="absolute -top-1.25 -right-5 text-xs text-gray-500 font-medium font-inter">
-                      <span className="mr-0.5">[</span>{emails.length}<span className="ml-0.5">]</span>
-                    </span>
-                  )}
-                </span>
-                {!emails && (
+                vanish
+                {!emails ? (
                   <Loader className="h-4 w-4 animate-spin text-muted-foreground translate-y-0.5" />
-                )}
+                ) : emails.length > 0 ? (
+                  <span className="text-lg text-gray-400 font-medium font-inter translate-y-0.25 -translate-x-0.25">
+                    <span className="mr-0.5">[</span>{emails.length}<span className="ml-0.5">]</span>
+                  </span>
+                ) : null}
               </h1>
             </div>
           </div>
