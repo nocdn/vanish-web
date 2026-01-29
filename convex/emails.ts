@@ -17,6 +17,16 @@ export const getEmails = query({
 	},
 });
 
+export const getEmailByEmail = query({
+	args: { email: v.string() },
+	handler: async (ctx, args) => {
+		return await ctx.db
+			.query("emails")
+			.withIndex("by_email", (q) => q.eq("email", args.email))
+			.unique();
+	},
+});
+
 export const listEmails = query({
 	// Validators for arguments.
 	args: {
