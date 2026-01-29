@@ -272,7 +272,7 @@ export default function Home() {
         onOpenChange={setGenerateDrawerOpen}
         shouldScaleBackground
       >
-        <main className="h-screen bg-background flex flex-col">
+        <main className="h-svh bg-background flex flex-col">
           <div className="px-6 pt-12 md:px-12 lg:px-24">
             <div className="mx-auto max-w-2xl">
               <h1 className="flex items-center gap-3 text-2xl font-medium tracking-tight text-foreground">
@@ -281,7 +281,9 @@ export default function Home() {
                   <Loader className="h-4 w-4 animate-spin text-muted-foreground translate-y-0.5" />
                 ) : emails.length > 0 ? (
                   <span className="text-lg text-gray-400 font-medium font-inter translate-y-0.25 -translate-x-0.25">
-                    <span className="mr-0.5">[</span>{emails.length}<span className="ml-0.5">]</span>
+                    <span className="mr-0.5">[</span>
+                    {emails.length}
+                    <span className="ml-0.5">]</span>
                   </span>
                 ) : null}
               </h1>
@@ -289,7 +291,8 @@ export default function Home() {
           </div>
 
           <div className="relative flex-1 overflow-hidden">
-            <div className="absolute inset-0 overflow-y-auto px-6 md:px-12 lg:px-24 py-8">
+            <div className="top-scroll-mask -translate-y-0.5 z-10" />
+            <div className="absolute inset-0 overflow-y-auto px-6 md:px-12 lg:px-24 py-10">
               <div className="mx-auto max-w-2xl">
                 {emails && emails.length === 0 ? (
                   <div className="text-sm text-muted-foreground">
@@ -314,11 +317,7 @@ export default function Home() {
                               e.stopPropagation();
                               handleCopy(email._id, email.email);
                             }}
-                            className="w-fit cursor-pointer text-left text-[15px] text-foreground hover:opacity-70 transition-opacity leading-none"
-                            style={{
-                              fontFamily: 'var(--font-berkeley-mono)',
-                              textShadow: '0.2px 0.2px 0 black',
-                            }}
+                            className="w-fit cursor-pointer text-left text-[15px] text-foreground hover:opacity-70 transition-opacity leading-none font-ioskeley-mono font-semibold antialiased"
                           >
                             {copiedId === email._id ? (
                               <span className="text-blue-700 leading-none">
@@ -331,11 +330,7 @@ export default function Home() {
                           {email.expiry && copiedId !== email._id && (
                             <button
                               type="button"
-                              className="text-blue-700 text-[14px] font-medium opacity-80 cursor-pointer hover:opacity-100"
-                              style={{
-                                fontFamily: 'var(--font-berkeley-mono)',
-                                textShadow: '0.2px 0.2px 0 black',
-                              }}
+                              className="text-blue-700 text-[14px] opacity-80 cursor-pointer hover:opacity-100 font-ioskeley-mono font-semibold antialiased"
                               onClick={(e) => toggleDateExpand(email._id, e)}
                             >
                               [
@@ -475,11 +470,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={handleEditCopy}
-                    className="w-full text-left text-foreground hover:opacity-70 transition-opacity"
-                    style={{
-                      fontFamily: 'var(--font-berkeley-mono)',
-                      textShadow: '0.2px 0.2px 0 black',
-                    }}
+                    className="w-full text-left text-foreground hover:opacity-70 transition-opacity font-ioskeley-mono font-semibold antialiased"
                   >
                     {editCopied ? (
                       <span className="text-blue-700">[copied]</span>
