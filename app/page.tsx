@@ -2,8 +2,8 @@
 
 import * as chrono from 'chrono-node';
 import { useAction, useQuery } from 'convex/react';
+import { joyful } from 'joyful';
 import { Loader } from 'lucide-react';
-import { generate } from 'random-words';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Drawer } from 'vaul';
 
@@ -187,9 +187,7 @@ export default function Home() {
   };
 
   const generateRandomEmail = () => {
-    const words = generate({ exactly: 2, maxLength: 8 }) as string[];
-    const randomNum = Math.floor(Math.random() * 900) + 100;
-    return `${words[0]}_${words[1]}${randomNum}`;
+    return joyful();
   };
 
   const handleConfirm = async () => {
@@ -291,8 +289,15 @@ export default function Home() {
           </div>
 
           <div className="relative flex-1 overflow-hidden">
-            <div className="top-scroll-mask -translate-y-0.5 z-10" />
-            <div className="absolute inset-0 overflow-y-auto px-6 md:px-12 lg:px-24 py-10">
+            <div className="top-scroll-mask -translate-y-0.75 z-10" />
+            <div
+              className="absolute inset-0 overflow-y-auto px-6 md:px-12 lg:px-24 py-10"
+              style={
+                {
+                  scrollTimeline: '--emails-scroll block',
+                } as React.CSSProperties
+              }
+            >
               <div className="mx-auto max-w-2xl">
                 {emails && emails.length === 0 ? (
                   <div className="text-sm text-muted-foreground">

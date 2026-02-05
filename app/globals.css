@@ -181,4 +181,14 @@
     rgba(255, 255, 255, 1) 80%
   );
   pointer-events: none;
+  opacity: 0;
+  animation: fade-in-mask linear forwards;
+  animation-timeline: --emails-scroll;
+  animation-range: 0px 50px;
+}
+
+@keyframes fade-in-mask {
+  to {
+    opacity: 1;
+  }
 }
