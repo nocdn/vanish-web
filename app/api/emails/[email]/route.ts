@@ -8,9 +8,10 @@ const convex = new ConvexHttpClient(convexUrl);
 
 export async function DELETE(
 	_request: Request,
-	{ params }: { params: { email: string } },
+	{ params }: { params: Promise<{ email: string }> },
 ) {
-	const email = decodeURIComponent(params.email);
+	const { email: emailParam } = await params;
+	const email = decodeURIComponent(emailParam);
 
 	const existing = await convex.query(api.emails.getEmailByEmail, { email });
 	if (!existing) {
