@@ -289,7 +289,7 @@ export default function Home() {
           </div>
 
           <div className="relative flex-1 overflow-hidden">
-            <div className="top-scroll-mask -translate-y-0.75 z-10" />
+            <div className="top-scroll-mask -translate-y-2.25 z-10" />
             <div
               className="absolute inset-0 overflow-y-auto px-6 md:px-12 lg:px-24 py-10"
               style={
