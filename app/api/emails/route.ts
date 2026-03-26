@@ -49,3 +49,46 @@ export async function POST(request: Request) {
 		},
 	);
 }
+
+export async function DELETE(request: Request) {
+	let body: unknown;
+
+	try {
+		body = await request.json();
+	} catch {
+		return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+			status: 400,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+
+	const email =
+		typeof body === "object" &&
+		body !== null &&
+		"email" in body &&
+		typeof body.email === "string"
+			? body.email.trim()
+			: "";
+
+	if (!email) {
+		return new Response(JSON.stringify({ error: 'Request body must include an "email" string' }), {
+			status: 400,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+
+	const existing = await convex.query(api.emails.getEmailByEmail, { email });
+	if (!existing) {
+		return new Response(JSON.stringify({ error: "Email not found" }), {
+			status: 404,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+
+	await convex.action(api.emails.deleteEmail, { id: existing._id });
+
+	return new Response(JSON.stringify({ deleted: true, email, id: existing._id }), {
+		status: 200,
+		headers: { "Content-Type": "application/json" },
+	});
+}
