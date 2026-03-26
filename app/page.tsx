@@ -2,13 +2,13 @@
 
 import * as chrono from 'chrono-node';
 import { useAction, useQuery } from 'convex/react';
-import { joyful } from 'joyful';
 import { Loader } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Drawer } from 'vaul';
 
 import { api } from '../convex/_generated/api';
 import type { Id } from '../convex/_generated/dataModel';
+import { generateRandomEmail } from '../lib/generate-random-email';
 
 type Email = {
   _id: Id<'emails'>;
@@ -184,10 +184,6 @@ export default function Home() {
       e.preventDefault();
       handleConfirm();
     }
-  };
-
-  const generateRandomEmail = () => {
-    return joyful();
   };
 
   const handleConfirm = async () => {

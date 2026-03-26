@@ -1,15 +1,11 @@
 import * as chrono from "chrono-node";
 import { ConvexHttpClient } from "convex/browser";
-import { joyful } from "joyful";
 import { api } from "@/convex/_generated/api";
+import { generateRandomEmail } from "@/lib/generate-random-email";
 
 const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
 if (!convexUrl) throw new Error("NEXT_PUBLIC_CONVEX_URL is not set");
 const convex = new ConvexHttpClient(convexUrl);
-
-function generateRandomEmail(): string {
-	return joyful();
-}
 
 export async function GET(_request: Request) {
 	const emails = await convex.query(api.emails.getEmails);
