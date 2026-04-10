@@ -299,21 +299,19 @@ export default function Home() {
   return (
     <>
       <main className="h-svh bg-background flex flex-col">
-        <div className="relative flex-1 overflow-hidden">
-          <div className="top-scroll-mask z-10" />
-          {!emails ? (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
-            </div>
-          ) : null}
-          <div
-            className={`absolute inset-0 overflow-y-auto px-6 md:px-12 lg:px-24 pt-10 pb-10${!emails ? ' hidden' : ''}`}
-          >
-            <div className="mx-auto max-w-2xl">
+        <div className="min-h-0 flex-1 overflow-hidden px-6 md:px-12 lg:px-24">
+          <div className="relative mx-auto h-full max-w-2xl overflow-hidden">
+            <div className="top-scroll-mask z-10" />
+            {!emails ? (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : null}
+            <div
+              className={`absolute inset-0 overflow-y-auto pt-10 pb-10${!emails ? ' hidden' : ''}`}
+            >
               {emails && emails.length === 0 ? (
-                <div className="text-sm text-muted-foreground">
-                  No emails yet
-                </div>
+                <div className="text-sm text-muted-foreground">No emails yet</div>
               ) : emails ? (
                 <ul className="space-y-4 pb-8">
                   {emails.map((email, index) => (
@@ -377,11 +375,11 @@ export default function Home() {
                 </ul>
               ) : null}
             </div>
+            <div className="bottom-scroll-mask z-10" />
           </div>
-          <div className="bottom-scroll-mask z-10 translate-y-1.5" />
         </div>
 
-        <div className="px-6 pb-6 md:px-12 lg:px-24">
+        <div className="px-6 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] md:px-12 lg:px-24">
           <div className="mx-auto max-w-2xl">
             <div className="flex gap-3">
               <button
