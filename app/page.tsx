@@ -70,6 +70,7 @@ export default function Home() {
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
 
   const [generateDrawerOpen, setGenerateDrawerOpen] = useState(false);
+  const [exportDrawerOpen, setExportDrawerOpen] = useState(false);
   const [expiryInput, setExpiryInput] = useState('');
   const [parsedExpiry, setParsedExpiry] = useState<number | undefined>(
     undefined,
@@ -77,6 +78,7 @@ export default function Home() {
   const [isParsingExpiry, setIsParsingExpiry] = useState(false);
   const [comment, setComment] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
   const [editingEmail, setEditingEmail] = useState<Email | null>(null);
@@ -154,7 +156,12 @@ export default function Home() {
     if (isMobile) return;
 
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' && !generateDrawerOpen && !editDrawerOpen) {
+      if (
+        e.key === 'Enter' &&
+        !generateDrawerOpen &&
+        !exportDrawerOpen &&
+        !editDrawerOpen
+      ) {
         const target = e.target as HTMLElement;
         if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
         e.preventDefault();
@@ -164,7 +171,7 @@ export default function Home() {
 
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [generateDrawerOpen, editDrawerOpen]);
+  }, [generateDrawerOpen, exportDrawerOpen, editDrawerOpen]);
 
   useEffect(() => {
     if (generateDrawerOpen) {
@@ -206,6 +213,36 @@ export default function Home() {
       setComment('');
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleExportEmails = async () => {
+    if (!emails) return;
+
+    setIsExporting(true);
+
+    try {
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+
+      const fileName = `vanish-emails-${new Date().toISOString().replaceAll(':', '-')}.json`;
+      const blob = new Blob([JSON.stringify(emails, null, 2)], {
+        type: 'application/json',
+      });
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+
+      link.href = downloadUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      URL.revokeObjectURL(downloadUrl);
+      setExportDrawerOpen(false);
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -261,45 +298,46 @@ export default function Home() {
 
   return (
     <>
-      <Drawer.Root
-        open={generateDrawerOpen}
-        onOpenChange={setGenerateDrawerOpen}
-        shouldScaleBackground
-      >
-        <main className="h-svh bg-background flex flex-col">
-          <div className="relative flex-1 overflow-hidden">
-            <div className="top-scroll-mask -translate-y-2.25 z-10" />
-            {!emails ? (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
-              </div>
-            ) : null}
-            <div
-              className={`absolute inset-0 overflow-y-auto px-6 md:px-12 lg:px-24 py-10${!emails ? ' hidden' : ''}`}
-              style={
-                {
-                  scrollTimeline: '--emails-scroll block',
-                } as React.CSSProperties
-              }
-            >
-              <div className="mx-auto max-w-2xl">
-                {emails && emails.length === 0 ? (
-                  <div className="text-sm text-muted-foreground">
-                    No emails yet
-                  </div>
-                ) : emails ? (
-                  <ul className="space-y-4 pb-8">
-                    {emails.map((email, index) => (
-                      <li
-                        key={email._id}
-                        className="group flex flex-col gap-1 border-b border-border/40 pb-4 last:border-0 animate-in fade-in slide-in-from-bottom-1 cursor-pointer"
-                        style={{
-                          animationDelay: `${index * 0.02}s`,
-                          animationFillMode: 'backwards',
-                        }}
-                        onClick={() => openEditDrawer(email)}
-                      >
-                        <div className="flex gap-2 md:flex-row flex-col md:items-center items-start">
+      <main className="h-svh bg-background flex flex-col">
+        <div className="relative flex-1 overflow-hidden">
+          <div className="top-scroll-mask -translate-y-2.25 z-10" />
+          {!emails ? (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : null}
+          <div
+            className={`absolute inset-0 overflow-y-auto px-6 md:px-12 lg:px-24 pt-8 pb-10${!emails ? ' hidden' : ''}`}
+            style={
+              {
+                scrollTimeline: '--emails-scroll block',
+              } as React.CSSProperties
+            }
+          >
+            <div className="mx-auto max-w-2xl">
+              {emails && emails.length === 0 ? (
+                <div className="text-sm text-muted-foreground">
+                  No emails yet
+                </div>
+              ) : emails ? (
+                <ul className="space-y-4 pb-8">
+                  {emails.map((email, index) => (
+                    <li
+                      key={email._id}
+                      className="border-b border-border/40 pb-4 last:border-0 animate-in fade-in slide-in-from-bottom-1"
+                      style={{
+                        animationDelay: `${index * 0.02}s`,
+                        animationFillMode: 'backwards',
+                      }}
+                    >
+                      <div className="group relative flex flex-col gap-1">
+                        <button
+                          type="button"
+                          className="absolute inset-0 cursor-pointer rounded-md"
+                          onClick={() => openEditDrawer(email)}
+                          aria-label={`Edit ${email.email}`}
+                        />
+                        <div className="relative z-10 flex gap-2 md:flex-row flex-col md:items-center items-start">
                           <button
                             type="button"
                             onClick={(e) => {
@@ -332,36 +370,51 @@ export default function Home() {
                         </div>
                         {email.comment && (
                           <span
-                            className="text-[13px] text-muted-foreground"
+                            className="pointer-events-none relative z-10 text-[13px] text-muted-foreground"
                             style={{ fontFamily: 'var(--font-inter)' }}
                           >
                             {email.comment}
                           </span>
                         )}
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-              </div>
-            </div>
-            <div className="bottom-scroll-mask z-10 translate-y-1.5" />
-          </div>
-
-          <div className="px-6 pb-6 md:px-12 lg:px-24">
-            <div className="mx-auto max-w-2xl">
-              <Drawer.Trigger asChild>
-                <button
-                  type="button"
-                  className="button-3 w-full py-3 text-sm font-semibold"
-                  onMouseDown={() => setGenerateDrawerOpen(true)}
-                >
-                  Generate
-                </button>
-              </Drawer.Trigger>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
           </div>
-        </main>
+          <div className="bottom-scroll-mask z-10 translate-y-1.5" />
+        </div>
 
+        <div className="px-6 pb-6 md:px-12 lg:px-24">
+          <div className="mx-auto max-w-2xl">
+            <div className="flex gap-3">
+              <button
+                type="button"
+                className="button-3 flex-1 h-11 text-sm font-semibold"
+                onMouseDown={() => setGenerateDrawerOpen(true)}
+              >
+                Generate
+              </button>
+
+              <button
+                type="button"
+                className="button-3 flex h-11 shrink-0 items-center justify-center px-6 text-sm font-semibold"
+                onMouseDown={() => setExportDrawerOpen(true)}
+                aria-label="Options"
+              >
+                Options
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <Drawer.Root
+        open={generateDrawerOpen}
+        onOpenChange={setGenerateDrawerOpen}
+        shouldScaleBackground
+      >
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 bg-black/40" />
           <Drawer.Content className="fixed bottom-0 left-0 right-0 bg-background rounded-t-[10px] flex flex-col">
@@ -375,7 +428,7 @@ export default function Home() {
                 <div>
                   <label
                     htmlFor="expiry"
-                    className="flex text-sm text-muted-foreground mb-1 items-center justify-between"
+                    className="flex text-sm text-muted-foreground mb-1 items-center font-medium justify-between"
                   >
                     <p>{parsedExpiry ? 'Expires:' : 'Expiry'}</p>
                     {parsedExpiry && (
@@ -395,7 +448,7 @@ export default function Home() {
                       onChange={(e) => handleExpiryChange(e.target.value)}
                       onKeyDown={handleExpiryKeyDown}
                       placeholder="Optional"
-                      className="w-full px-3 py-2 pr-9 border border-border rounded-md bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      className="w-full px-3 py-2 pr-9 border border-gray-200 rounded-md bg-background text-foreground text-sm focus:outline-none"
                     />
                     {isParsingExpiry && (
                       <Loader className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
@@ -406,7 +459,7 @@ export default function Home() {
                 <div>
                   <label
                     htmlFor="comment"
-                    className="block text-sm text-muted-foreground mb-1"
+                    className="block text-sm font-medium text-muted-foreground mb-1"
                   >
                     Comment
                   </label>
@@ -420,7 +473,7 @@ export default function Home() {
                     onChange={(e) => setComment(e.target.value)}
                     onKeyDown={handleCommentKeyDown}
                     placeholder="Optional"
-                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-md bg-background text-foreground text-sm focus:outline-none"
                   />
                 </div>
 
@@ -434,6 +487,37 @@ export default function Home() {
                     <Loader className="h-4 w-4 animate-spin" />
                   ) : (
                     'Confirm'
+                  )}
+                </button>
+              </div>
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+
+      <Drawer.Root
+        open={exportDrawerOpen}
+        onOpenChange={setExportDrawerOpen}
+        shouldScaleBackground
+      >
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+          <Drawer.Content className="fixed bottom-0 left-0 right-0 bg-background rounded-t-[10px] flex flex-col">
+            <div className="p-4 pb-8 mx-auto w-full max-w-md">
+              <div className="mx-auto w-12 h-1.5 shrink-0 rounded-full bg-muted mb-6" />
+              <Drawer.Title className="sr-only">Export options</Drawer.Title>
+
+              <div className="space-y-4">
+                <button
+                  type="button"
+                  className="button-3 w-full h-11 text-sm font-semibold flex items-center justify-center"
+                  onMouseDown={handleExportEmails}
+                  disabled={isExporting || !emails}
+                >
+                  {isExporting ? (
+                    <Loader className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'Export emails'
                   )}
                 </button>
               </div>
