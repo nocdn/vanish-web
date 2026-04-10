@@ -300,19 +300,14 @@ export default function Home() {
     <>
       <main className="h-svh bg-background flex flex-col">
         <div className="relative flex-1 overflow-hidden">
-          <div className="top-scroll-mask -translate-y-2.25 z-10" />
+          <div className="top-scroll-mask z-10" />
           {!emails ? (
             <div className="absolute inset-0 flex items-center justify-center">
               <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : null}
           <div
-            className={`absolute inset-0 overflow-y-auto px-6 md:px-12 lg:px-24 pt-8 pb-10${!emails ? ' hidden' : ''}`}
-            style={
-              {
-                scrollTimeline: '--emails-scroll block',
-              } as React.CSSProperties
-            }
+            className={`absolute inset-0 overflow-y-auto px-6 md:px-12 lg:px-24 pt-10 pb-10${!emails ? ' hidden' : ''}`}
           >
             <div className="mx-auto max-w-2xl">
               {emails && emails.length === 0 ? (
@@ -420,7 +415,7 @@ export default function Home() {
           <Drawer.Content className="fixed bottom-0 left-0 right-0 bg-background rounded-t-[10px] flex flex-col">
             <div className="p-4 pb-8 mx-auto w-full max-w-md">
               <div className="mx-auto w-12 h-1.5 shrink-0 rounded-full bg-muted mb-6" />
-              <Drawer.Title className="text-lg font-medium mb-4">
+              <Drawer.Title className="sr-only">
                 Generate Email
               </Drawer.Title>
 
