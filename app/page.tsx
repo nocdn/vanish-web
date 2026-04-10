@@ -267,27 +267,15 @@ export default function Home() {
         shouldScaleBackground
       >
         <main className="h-svh bg-background flex flex-col">
-          <div className="px-6 pt-12 md:px-12 lg:px-24">
-            <div className="mx-auto max-w-2xl">
-              <h1 className="flex items-center gap-3 text-2xl font-medium tracking-tight text-foreground">
-                vanish
-                {!emails ? (
-                  <Loader className="h-4 w-4 animate-spin text-muted-foreground translate-y-0.5" />
-                ) : emails.length > 0 ? (
-                  <span className="text-lg text-gray-400 font-medium font-inter translate-y-0.25 -translate-x-0.25">
-                    <span className="mr-0.5">[</span>
-                    {emails.length}
-                    <span className="ml-0.5">]</span>
-                  </span>
-                ) : null}
-              </h1>
-            </div>
-          </div>
-
           <div className="relative flex-1 overflow-hidden">
             <div className="top-scroll-mask -translate-y-2.25 z-10" />
+            {!emails ? (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : null}
             <div
-              className="absolute inset-0 overflow-y-auto px-6 md:px-12 lg:px-24 py-10"
+              className={`absolute inset-0 overflow-y-auto px-6 md:px-12 lg:px-24 py-10${!emails ? ' hidden' : ''}`}
               style={
                 {
                   scrollTimeline: '--emails-scroll block',
@@ -304,7 +292,7 @@ export default function Home() {
                     {emails.map((email, index) => (
                       <li
                         key={email._id}
-                        className="group flex flex-col gap-1 border-b border-border pb-4 last:border-0 animate-in fade-in slide-in-from-bottom-1 cursor-pointer"
+                        className="group flex flex-col gap-1 border-b border-border/40 pb-4 last:border-0 animate-in fade-in slide-in-from-bottom-1 cursor-pointer"
                         style={{
                           animationDelay: `${index * 0.02}s`,
                           animationFillMode: 'backwards',
