@@ -94,7 +94,14 @@ export async function PATCH(request: Request) {
 		);
 	}
 
-	const commentResult = readOptionalComment(body);
+	console.info("[api/emails PATCH] Looking up email", { requestId, email });
+	const existing = await convex.query(api.emails.getEmailByEmail, { email });
+	if (!existing) {
+		console.warn("[api/emails PATCH] Email not found", { requestId, email });
+		return jsonResponse({ error: "Email not found" }, 404);
+	}
+
+	const commentResult = readOptionalComment(body, existing.comment);
 	if (!commentResult.ok) {
 		console.warn("[api/emails PATCH] Invalid comment", { requestId, email });
 		return jsonResponse(
@@ -103,20 +110,14 @@ export async function PATCH(request: Request) {
 		);
 	}
 
-	const expiryResult = readOptionalExpiry(body);
+	const expiryResult = readOptionalExpiry(body, existing.expiry);
 	if (!expiryResult.ok) {
-		console.warn("[api/emails PATCH] Invalid expiry", { requestId, email });
-		return jsonResponse(
-			{ error: 'Request body "expiry" must be a number or null' },
-			400,
-		);
-	}
-
-	console.info("[api/emails PATCH] Looking up email", { requestId, email });
-	const existing = await convex.query(api.emails.getEmailByEmail, { email });
-	if (!existing) {
-		console.warn("[api/emails PATCH] Email not found", { requestId, email });
-		return jsonResponse({ error: "Email not found" }, 404);
+		console.warn("[api/emails PATCH] Invalid expiry", {
+			requestId,
+			email,
+			error: expiryResult.error,
+		});
+		return jsonResponse({ error: expiryResult.error }, 400);
 	}
 
 	console.info("[api/emails PATCH] Updating email", {
@@ -213,9 +214,10 @@ function jsonResponse(data: unknown, status: number) {
 
 function readOptionalComment(
 	body: unknown,
+	fallback: string | undefined,
 ): { ok: true; value: string | undefined } | { ok: false } {
 	if (typeof body !== "object" || body === null || !("comment" in body)) {
-		return { ok: true, value: undefined };
+		return { ok: true, value: fallback };
 	}
 
 	if (body.comment === null) {
@@ -232,20 +234,43 @@ function readOptionalComment(
 
 function readOptionalExpiry(
 	body: unknown,
-): { ok: true; value: number | undefined } | { ok: false } {
+	fallback: number | undefined,
+):
+	| { ok: true; value: number | undefined }
+	| { ok: false; error: string } {
 	if (typeof body !== "object" || body === null || !("expiry" in body)) {
-		return { ok: true, value: undefined };
+		return { ok: true, value: fallback };
 	}
 
 	if (body.expiry === null) {
 		return { ok: true, value: undefined };
 	}
 
-	if (typeof body.expiry !== "number" || !Number.isFinite(body.expiry)) {
-		return { ok: false };
+	if (typeof body.expiry === "number" && Number.isFinite(body.expiry)) {
+		return { ok: true, value: body.expiry };
 	}
 
-	return { ok: true, value: body.expiry };
+	if (typeof body.expiry === "string") {
+		const trimmedExpiry = body.expiry.trim();
+		if (!trimmedExpiry || trimmedExpiry === "never") {
+			return { ok: true, value: undefined };
+		}
+
+		const parsedExpiry = chrono.parseDate(trimmedExpiry)?.getTime();
+		if (parsedExpiry) {
+			return { ok: true, value: parsedExpiry };
+		}
+
+		return {
+			ok: false,
+			error: "Expiry must be a timestamp, date string, or null",
+		};
+	}
+
+	return {
+		ok: false,
+		error: 'Request body "expiry" must be a number, date string, or null',
+	};
 }
 
 function getUpdateBodyLogPayload(body: unknown) {
@@ -259,8 +284,14 @@ function getUpdateBodyLogPayload(body: unknown) {
 				return [key, `[${value.length} chars]`];
 			}
 
-			if (key === "expiry" && typeof value === "number") {
-				return [key, new Date(value).toISOString()];
+			if (key === "expiry") {
+				if (typeof value === "number") {
+					return [key, new Date(value).toISOString()];
+				}
+
+				if (typeof value === "string") {
+					return [key, value];
+				}
 			}
 
 			return [key, value];
